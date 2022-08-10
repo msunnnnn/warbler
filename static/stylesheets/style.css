@@ -196,13 +196,21 @@ nav + .container {
   margin-left: 10px;
 }
 
-#warbler-hero {
+#warbler-hero{
   height: 360px;
   margin-top: -16px;
   opacity: 0.7;
   background-size: cover;
   background-position: top center;
 }
+
+#warbler-hero-img{
+  height: 360px;
+  opacity: 0.7;
+  background-size: cover;
+  background-position: top center;
+}
+
 
 .full-width {
   width: 100vw;

@@ -264,12 +264,15 @@ def delete_user():
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
-# FIXME: add csrf 
-    db.session.delete(g.user)
-    db.session.commit()
 
-    do_logout()
-    return redirect("/signup")
+    if g.csrf_form.validate_on_submit():
+        db.session.delete(g.user)
+        db.session.commit()
+        do_logout()
+        return redirect("/signup")
+
+    else:
+        return redirect(f"/users/{g.user.id}")
 
 
 ##############################################################################
@@ -340,11 +343,11 @@ def homepage():
     - anon users: no messages
     - logged in: 100 most recent messages of followed_users
     """
-    followed = [user.id for user in g.user.following]
-    followed.append(g.user.id)
-# How do we do this in comprehension?
 
     if g.user:
+        followed = [user.id for user in g.user.following]
+        followed.append(g.user.id)
+
         messages = (Message
                     .query
                     .order_by(Message.timestamp.desc())

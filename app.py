@@ -35,7 +35,7 @@ connect_db(app)
 @app.before_request
 def add_user_to_g():
     """If we're logged in, add curr user to Flask global.
-    and add csrf_form to global"""
+    Adds global csfr_form"""
 
     if CURR_USER_KEY in session:
         g.user = User.query.get(session[CURR_USER_KEY])
@@ -43,6 +43,7 @@ def add_user_to_g():
 
     else:
         g.user = None
+
 
 
 def do_login(user):
@@ -128,7 +129,7 @@ def logout():
 
     else:
 
-        redirect(f'/users/{session[CURR_USER_KEY]}')
+        redirect(f'/users/{g.user.id}')
 
 
 
@@ -263,12 +264,11 @@ def delete_user():
     if not g.user:
         flash("Access unauthorized.", "danger")
         return redirect("/")
-
-    do_logout()
-
+# FIXME: add csrf 
     db.session.delete(g.user)
     db.session.commit()
 
+    do_logout()
     return redirect("/signup")
 
 
@@ -340,13 +340,17 @@ def homepage():
     - anon users: no messages
     - logged in: 100 most recent messages of followed_users
     """
+    followed = [user.id for user in g.user.following]
+    followed.append(g.user.id)
+# How do we do this in comprehension?
 
     if g.user:
         messages = (Message
                     .query
                     .order_by(Message.timestamp.desc())
-                    .limit(100)
-                    .all())
+                    .filter(Message.user_id.in_(followed))
+                    .limit(100))
+
 
         return render_template('home.html', messages=messages)
 

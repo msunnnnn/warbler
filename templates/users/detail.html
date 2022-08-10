@@ -1,10 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
-
+<!-- use style attribute - background image -->
 <div id = "warbler-hero"
-     class="full-width">
-     <img src={{user.header_image_url}} alt="" class = "full-width" id = "warbler-hero-img">
+     class="full-width"
+     style = background-image:url({{user.header_image_url}})>
 </div>
 <img src="{{ user.image_url }}"
      alt="Image for {{ user.username }}"

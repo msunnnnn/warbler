@@ -143,6 +143,7 @@ class User(db.Model):
         return len(found_user_list) == 1
 
 
+
 class Message(db.Model):
     """An individual message ("warble")."""
 

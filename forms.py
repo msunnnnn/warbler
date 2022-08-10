@@ -2,6 +2,8 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, TextAreaField
 from wtforms.validators import DataRequired, Email, Length
 
+#what's diff between datarequired and input required?
+
 
 class MessageForm(FlaskForm):
     """Form for adding/editing messages."""
@@ -27,3 +29,12 @@ class LoginForm(FlaskForm):
 class CSFROnly(FlaskForm):
     """Form for CSRF Protection"""
 
+class UpdateUserForm(FlaskForm):
+    """Form for updating user"""
+
+    username = StringField('Username', validators=[DataRequired()])
+    email = StringField('E-mail', validators=[DataRequired(), Email()])
+    image_url = StringField('(Optional) Image URL')
+    header_image_url = StringField('(Optional) Header Image URL')
+    bio = StringField ('Bio')
+    password = PasswordField('Password', validators=[DataRequired()])

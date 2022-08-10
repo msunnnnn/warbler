@@ -76,6 +76,7 @@ class User(db.Model):
     )
 
     messages = db.relationship('Message', backref="user")
+    #better name for user should be author
 
     followers = db.relationship(
         "User",
@@ -84,6 +85,14 @@ class User(db.Model):
         secondaryjoin=(Follows.user_following_id == id),
         backref="following",
     )
+
+    favorites = db.relationship(
+        "Message",
+        secondary='favorites',
+        backref='users'
+    )
+
+    #why can't we use user as backref again?
 
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
@@ -170,6 +179,25 @@ class Message(db.Model):
         db.ForeignKey('users.id', ondelete='cascade'),
         nullable=False,
     )
+
+class Favorite(db.Model):
+    """Connection of a user <-> message."""
+
+    __tablename__ = 'favorites'
+
+    user_id = db.Column(
+        db.Integer,
+        db.ForeignKey('users.id', ondelete="cascade"),
+        primary_key=True,
+    )
+
+    message_id = db.Column(
+        db.Integer,
+        db.ForeignKey('messages.id', ondelete="cascade"),
+        primary_key=True,
+    )
+
+
 
 
 def connect_db(app):

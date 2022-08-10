@@ -331,6 +331,19 @@ def delete_message(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
+@app.post('/messages/<int:message_id>/favorite')
+def favorite_message(message_id):
+    """Favorites a message"""
+
+    message = Message.query.get_or_404(message_id)
+    if message not in g.user.favorites:
+        g.user.favorites.append(message)
+        return redirect('/')
+    else:
+        flash('Already favorited!')
+        return redirect('/')
+
+
 
 ##############################################################################
 # Homepage and error pages

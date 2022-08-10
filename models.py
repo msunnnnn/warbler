@@ -180,6 +180,14 @@ class Message(db.Model):
         nullable=False,
     )
 
+    def is_favorite(self,user):
+        """Tests if current user favorited this message"""
+
+        if user in self.users:
+            return True
+        else:
+            return False
+
 class Favorite(db.Model):
     """Connection of a user <-> message."""
 

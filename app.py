@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 
 from forms import UserAddForm, LoginForm, MessageForm, CSFROnly, UpdateUserForm
-from models import db, connect_db, User, Message, bcrypt
+from models import db, connect_db, User, Message, bcrypt, Favorite
 
 load_dotenv()
 
@@ -337,7 +337,9 @@ def favorite_message(message_id):
 
     message = Message.query.get_or_404(message_id)
     if message not in g.user.favorites:
-        g.user.favorites.append(message)
+        new_fav = Favorite(user_id = g.user.id, message_id = message.id)
+        db.session.add(new_fav)
+        db.session.commit()
         return redirect('/')
     else:
         flash('Already favorited!')

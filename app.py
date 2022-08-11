@@ -285,14 +285,16 @@ def show_likes(user_id):
 
 
 @app.post('/users/<int:user_id>/<int:msg_id>/likes')
-def unlike_msg(user_id,msg_id):
+def handle_like_msg(user_id,msg_id):
     """Handles unliking a liked message from user page"""
+
 
     message = Message.query.get_or_404(msg_id)
 
     if g.csrf_form.validate_on_submit():
         if message not in g.user.likes:
             new_fav = Like(user_id = g.user.id, message_id = message.id)
+            #can do g.user.append(message)
             db.session.add(new_fav)
             db.session.commit()
             return redirect(f'/users/{user_id}')
@@ -366,19 +368,23 @@ def delete_message(message_id):
     return redirect(f"/users/{g.user.id}")
 
 @app.post('/messages/<int:message_id>/like')
-def like_message(message_id):
-    """likes a message"""
+def handle_like_message(message_id):
+    """handle likes a message"""
 
     message = Message.query.get_or_404(message_id)
     if message not in g.user.likes:
         new_fav = Like(user_id = g.user.id, message_id = message.id)
         db.session.add(new_fav)
+        #change to append
         db.session.commit()
         return redirect('/')
     else:
         g.user.likes.remove(message)
         db.session.commit()
         return redirect('/')
+
+        #request.referrer object(where we came from) - might break with ad blockers
+        # if request.referrer falsy, redirect to message itself, otherwise go to where came from
 
 
 

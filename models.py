@@ -91,8 +91,9 @@ class User(db.Model):
         secondary='likes',
         backref='users'
     )
+    #rename to liked_messages, and for backref
 
-    #why can't we use user as backref again?
+
 
     def __repr__(self):
         return f"<User #{self.id}: {self.username}, {self.email}>"
@@ -181,7 +182,7 @@ class Message(db.Model):
 
     def is_liked(self,user):
         """Tests if current user liked this message"""
-
+        # could do directly in jinja
         if user in self.users:
             return True
         else:

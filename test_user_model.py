@@ -45,8 +45,32 @@ class UserModelTestCase(TestCase):
         db.session.rollback()
 
     def test_user_model(self):
+        """Tests user is created"""
         u1 = User.query.get(self.u1_id)
 
         # User should have no messages & no followers
         self.assertEqual(len(u1.messages), 0)
         self.assertEqual(len(u1.followers), 0)
+
+    def test__repr__(self):
+        """Test repr function works"""
+        u1 = User.query.get(self.u1_id)
+        repr = u1.__repr__()
+
+        self.assertIn(self.u1_id, repr)
+
+    def test_is_following(self):
+        """"Tests is following"""
+        u1 = User.query.get(self.u1_id)
+        u2 = User.query.get(self.u2_id)
+
+        u1.followers.appened(u2)
+
+        follow = u1.is_following(u2)
+
+        self.assertTrue(follow)
+
+
+
+
+

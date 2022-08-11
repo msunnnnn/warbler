@@ -7,7 +7,7 @@ from sqlalchemy.exc import IntegrityError
 
 
 from forms import UserAddForm, LoginForm, MessageForm, CSFROnly, UpdateUserForm
-from models import db, connect_db, User, Message, bcrypt, Favorite
+from models import db, connect_db, User, Message, bcrypt, Like
 
 load_dotenv()
 
@@ -274,6 +274,40 @@ def delete_user():
     else:
         return redirect(f"/users/{g.user.id}")
 
+@app.get('/users/<int:user_id>/likes')
+def show_likes(user_id):
+    """Display messages that user liked"""
+
+    user = User.query.get_or_404(user_id)
+    messages = user.likes
+
+    return render_template('/users/likes.html', messages=messages, user=user)
+
+
+@app.post('/users/<int:user_id>/<int:msg_id>/likes')
+def unlike_msg(user_id,msg_id):
+    """Handles unliking a liked message from user page"""
+
+    message = Message.query.get_or_404(msg_id)
+
+    if g.csrf_form.validate_on_submit():
+        if message not in g.user.likes:
+            new_fav = Like(user_id = g.user.id, message_id = message.id)
+            db.session.add(new_fav)
+            db.session.commit()
+            return redirect(f'/users/{user_id}')
+        else:
+            g.user.likes.remove(message)
+            db.session.commit()
+            if g.user.id == user_id:
+                return redirect(f'/users/{user_id}/likes')
+            else:
+                return redirect(f'/users/{user_id}')
+    else:
+        return redirect('/')
+        #what should we be doing? Flash, error, etc?
+
+
 
 ##############################################################################
 # Messages routes:
@@ -331,18 +365,18 @@ def delete_message(message_id):
 
     return redirect(f"/users/{g.user.id}")
 
-@app.post('/messages/<int:message_id>/favorite')
-def favorite_message(message_id):
-    """Favorites a message"""
+@app.post('/messages/<int:message_id>/like')
+def like_message(message_id):
+    """likes a message"""
 
     message = Message.query.get_or_404(message_id)
-    if message not in g.user.favorites:
-        new_fav = Favorite(user_id = g.user.id, message_id = message.id)
+    if message not in g.user.likes:
+        new_fav = Like(user_id = g.user.id, message_id = message.id)
         db.session.add(new_fav)
         db.session.commit()
         return redirect('/')
     else:
-        g.user.favorites.remove(message)
+        g.user.likes.remove(message)
         db.session.commit()
         return redirect('/')
 

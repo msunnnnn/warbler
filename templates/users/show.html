@@ -21,6 +21,22 @@
             </span>
         <p>{{ message.text }}</p>
       </div>
+      <div class="like-btn">
+        <form action="/users/{{user.id}}/{{message.id}}/likes" method="POST">
+          {{ g.csrf_form.hidden_tag() }}
+          <button type="submit" class="btn btn-link">
+            {% if message.user_id == g.user.id%}
+            {% elif message.is_liked(g.user) %}
+            <a href="">
+              <i class="bi bi-star-fill"></i></a>
+              {% else %}
+              <a href="">
+              <i class="bi bi-star"></i>
+            </a>
+            {% endif %}
+          </button>
+        </form>
+      </div>
     </li>
 
     {% endfor %}

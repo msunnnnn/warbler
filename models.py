@@ -86,9 +86,9 @@ class User(db.Model):
         backref="following",
     )
 
-    favorites = db.relationship(
+    likes = db.relationship(
         "Message",
-        secondary='favorites',
+        secondary='likes',
         backref='users'
     )
 
@@ -179,18 +179,18 @@ class Message(db.Model):
         db.ForeignKey('users.id', ondelete='cascade')
     )
 
-    def is_favorite(self,user):
-        """Tests if current user favorited this message"""
+    def is_liked(self,user):
+        """Tests if current user liked this message"""
 
         if user in self.users:
             return True
         else:
             return False
 
-class Favorite(db.Model):
+class Like(db.Model):
     """Connection of a user <-> message."""
 
-    __tablename__ = 'favorites'
+    __tablename__ = 'likes'
 
     user_id = db.Column(
         db.Integer,

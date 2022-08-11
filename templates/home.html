@@ -55,12 +55,12 @@
           <span class="text-muted">{{ msg.timestamp.strftime('%d %B %Y') }}</span>
           <p>{{ msg.text }}</p>
         </div>
-        <div class="favorite-btn">
-          <form action="/messages/{{msg.id}}/favorite" method="POST">
+        <div class="like-btn">
+          <form action="/messages/{{msg.id}}/like" method="POST">
             {{ g.csrf_form.hidden_tag() }}
             <button type="submit" class="btn btn-link">
               {% if msg.user_id == g.user.id%}
-              {% elif msg.is_favorite(g.user) %}
+              {% elif msg.is_liked(g.user) %}
               <a href="">
                 <i class="bi bi-star-fill"></i></a>
                 {% else %}

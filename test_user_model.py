@@ -6,7 +6,8 @@
 
 
 import os
-from unittest import TestCase
+from unittest import TestCase, expectedFailure
+from dotenv import load_dotenv
 
 from models import db, User, Message, Follows
 
@@ -14,7 +15,7 @@ from models import db, User, Message, Follows
 # to use a different database for tests (we need to do this
 # before we import our app, since that will have already
 # connected to the database
-
+load_dotenv()
 os.environ['DATABASE_URL'] = "postgresql:///warbler_test"
 
 # Now we can import app
@@ -57,18 +58,64 @@ class UserModelTestCase(TestCase):
         u1 = User.query.get(self.u1_id)
         repr = u1.__repr__()
 
-        self.assertIn(self.u1_id, repr)
+        self.assertIn(f'{self.u1_id}', repr)
 
     def test_is_following(self):
         """"Tests is following"""
         u1 = User.query.get(self.u1_id)
         u2 = User.query.get(self.u2_id)
 
-        u1.followers.appened(u2)
+        u1.followers.append(u2)
 
-        follow = u1.is_following(u2)
+        followA = u1.is_following(u2)
+        followB = u2.is_following(u1)
 
-        self.assertTrue(follow)
+        self.assertTrue(followB)
+        self.assertFalse(followA)
+
+    def test_is_followed_by(self):
+        """Test is_followed_by"""
+        u1 = User.query.get(self.u1_id)
+        u2 = User.query.get(self.u2_id)
+
+        u1.followers.append(u2)
+
+        followA = u1.is_followed_by(u2)
+        followB = u2.is_followed_by(u1)
+
+        self.assertTrue(followA)
+        self.assertFalse(followB)
+
+
+    @expectedFailure
+    def test_signup_fail(self):
+        """Test sign up fails with invalid inputs"""
+
+        invalid_user = User.signup('u1','invalidemail', 'password', None)
+        db.session.commit()
+
+    def test_signup_valid(self):
+        """Test sign up valid with valid inputs"""
+
+        u3 = User.signup('u3','u3@email.com', 'password', None)
+        db.session.commit()
+
+        self.assertIsInstance(u3, User)
+
+
+    def test_authenticate(self):
+        """Test authenticate"""
+
+        u1 = User.query.get(self.u1_id)
+        valid = User.authenticate(u1.username, 'password')
+        invalid_pw = User.authenticate(u1.username, 'invalid')
+        invalid_username = User.authenticate('invalid', 'password')
+
+
+        self.assertEqual(u1, valid)
+        self.assertFalse(invalid_pw)
+        self.assertFalse(invalid_username)
+
 
 
 

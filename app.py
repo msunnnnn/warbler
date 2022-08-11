@@ -11,6 +11,8 @@ from models import db, connect_db, User, Message, bcrypt, Like
 
 load_dotenv()
 
+
+
 CURR_USER_KEY = "curr_user"
 
 app = Flask(__name__)

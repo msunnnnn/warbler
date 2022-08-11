@@ -342,7 +342,8 @@ def favorite_message(message_id):
         db.session.commit()
         return redirect('/')
     else:
-        flash('Already favorited!')
+        g.user.favorites.remove(message)
+        db.session.commit()
         return redirect('/')
 
 

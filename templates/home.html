@@ -59,7 +59,8 @@
           <form action="/messages/{{msg.id}}/favorite" method="POST">
             {{ g.csrf_form.hidden_tag() }}
             <button type="submit" class="btn btn-link">
-              {% if msg.is_favorite(g.user) %}
+              {% if msg.user_id == g.user.id%}
+              {% elif msg.is_favorite(g.user) %}
               <a href="">
                 <i class="bi bi-star-fill"></i></a>
                 {% else %}

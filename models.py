@@ -176,8 +176,7 @@ class Message(db.Model):
 
     user_id = db.Column(
         db.Integer,
-        db.ForeignKey('users.id', ondelete='cascade'),
-        nullable=False,
+        db.ForeignKey('users.id', ondelete='cascade')
     )
 
     def is_favorite(self,user):

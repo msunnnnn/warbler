@@ -248,35 +248,43 @@ class GeneralUserRoutesTestCase(UserBaseViewTestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn("Test Likes", html)
 
-    def test_toggle_message_other_user_page(self):
-        """Tests liking/unliking message from another user's profile page"""
-        # TODO:Separate to 2 funcs
+    def test_like_message_other_user_page(self):
+        """Tests liking message from another user's profile page"""
         with self.client as c:
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.u1_id
 
-            liked_resp= c.post(f'/users/{self.u2_id}/{self.m2_id}/likes',
+            resp= c.post(f'/users/{self.u2_id}/{self.m2_id}/likes',
                                 follow_redirects= True)
-            liked_html = liked_resp.get_data(as_text = True)
+            html = resp.get_data(as_text = True)
 
-            self.assertEqual(liked_resp.status_code, 200)
-            self.assertIn("fill", liked_html)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("fill", html)
 
             u1 = User.query.get(self.u1_id)
             msg2 = Message.query.get(self.m2_id)
             self.assertIn(msg2, u1.likes)
 
+    def test_unlike_message_other_user_page(self):
+        """Tests unliking message from another user's profile page"""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
 
-            unliked_resp = c.post(f'/users/{self.u2_id}/{self.m2_id}/likes',
+            u1 = User.query.get(self.u1_id)
+            msg2 = Message.query.get(self.m2_id)
+            u1.likes.append(msg2)
+            db.session.commit()
+
+            resp = c.post(f'/users/{self.u2_id}/{self.m2_id}/likes',
                                follow_redirects= True)
-            unliked_html = unliked_resp.get_data(as_text = True)
+            html = resp.get_data(as_text = True)
 
             u2 = User.query.get(self.u2_id)
             u2_username = u2.username
 
-            self.assertEqual(unliked_resp.status_code, 200)
-            self.assertIn(f"{u2_username}", unliked_html)
-
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn(f"{u2_username}", html)
 
             u1 = User.query.get(self.u1_id)
             msg2 = Message.query.get(self.m2_id)
@@ -293,7 +301,6 @@ class GeneralUserRoutesTestCase(UserBaseViewTestCase):
             msg2 = Message.query.get(self.m2_id)
             u1.likes.append(msg2)
             db.session.commit()
-
 
             resp = c.post(f'/users/{self.u1_id}/{self.m2_id}/likes',
                                follow_redirects= True)

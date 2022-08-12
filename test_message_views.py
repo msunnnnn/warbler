@@ -118,32 +118,41 @@ class MessageAddViewTestCase(MessageBaseViewTestCase):
             self.assertIn("test show user", html)
 
     def test_like_message(self):
-        """Tests liking message"""
-        # TODO: separate to 2 funcs
+        """Tests liking message from homepage"""
         with self.client as c:
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.u1_id
 
-            liked_resp= c.post(f'/messages/{self.m2_id}/like',
+            resp= c.post(f'/messages/{self.m2_id}/like',
                                 follow_redirects= True)
-            liked_html = liked_resp.get_data(as_text = True)
+            html = resp.get_data(as_text = True)
 
-            self.assertEqual(liked_resp.status_code, 200)
-            self.assertIn("test homepage", liked_html)
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("test homepage", html)
 
             u1 = User.query.get(self.u1_id)
             msg2 = Message.query.get(self.m2_id)
             self.assertIn(msg2, u1.likes)
 
+    def test_unlike_message(self):
+        """Tests unliking message from homepage"""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
 
-            unliked_resp = c.post(f'/messages/{self.m2_id}/like',
-                               follow_redirects= True)
-            unliked_html = unliked_resp.get_data(as_text = True)
 
-            self.assertEqual(unliked_resp.status_code, 200)
-            self.assertIn("test homepage", unliked_html)
+            u1 = User.query.get(self.u1_id)
+            msg2 = Message.query.get(self.m2_id)
+            u1.likes.append(msg2)
+            db.session.commit()
 
-# is the query frozen in time from line 133/134
+            resp = c.post(f'/messages/{self.m2_id}/like',
+                        follow_redirects= True)
+            html = resp.get_data(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("test homepage", html)
+
             u1 = User.query.get(self.u1_id)
             msg2 = Message.query.get(self.m2_id)
 

@@ -56,6 +56,8 @@ body.error-404 {
 
 .nav > li > a > img {
   width: 32px;
+  height: 32px;
+  object-fit: cover;
   border-radius: 32px;
 }
 
@@ -163,6 +165,7 @@ nav + .container {
   border-radius: 100%;
   display: block;
   margin-left: -15px;
+  object-fit: cover;
 }
 
 #profile-image {
@@ -185,6 +188,7 @@ nav + .container {
   height: 48px;
   width: 48px;
   margin-top: 2px;
+  object-fit: cover;
 }
 
 .message-area,
@@ -346,6 +350,7 @@ nav + .container {
   margin-top: -35px;
   position: relative;
   z-index: 1;
+  object-fit: cover;
 }
 
 .card-link {

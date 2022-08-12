@@ -119,6 +119,7 @@ class MessageAddViewTestCase(MessageBaseViewTestCase):
 
     def test_like_message(self):
         """Tests liking message"""
+        # TODO: separate to 2 funcs
         with self.client as c:
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.u1_id

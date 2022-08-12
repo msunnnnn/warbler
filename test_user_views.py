@@ -157,36 +157,36 @@ class GeneralUserRoutesTestCase(UserBaseViewTestCase):
             self.assertIn("Test Following Page", html)
             self.assertIn(f'{u2_username}', html)
 
-            u2 = User.query.get(self.u2_id)
-            u2_username = u2.username
+            # u2 = User.query.get(self.u2_id)
+            # u2_username = u2.username
 
-            resp = c.post(f'/users/stop-following/{self.u2_id}', follow_redirects=True)
+            # resp = c.post(f'/users/stop-following/{self.u2_id}', follow_redirects=True)
+            # html = resp.get_data(as_text = True)
+
+            # self.assertEqual(resp.status_code, 200)
+            # self.assertIn("Test Following Page", html)
+            # self.assertNotIn(f'{u2_username}', html)
+
+    def test_stop_following(self):
+        """Tests in session user stop following another user"""
+
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
+
+            u1 = User.query.get(self.u1_id)
+            u2 = User.query.get(self.u2_id)
+            u3 = User.query.get(self.u3_id)
+            u3_username = u3.username
+
+
+            resp = c.post(f'/users/stop-following/{self.u3_id}', follow_redirects=True)
             html = resp.get_data(as_text = True)
 
             self.assertEqual(resp.status_code, 200)
             self.assertIn("Test Following Page", html)
-            self.assertNotIn(f'{u2_username}', html)
-
-    # def test_stop_following(self):
-    #     """Tests in session user stop following another user"""
-
-
-    #     with self.client as c:
-    #         with c.session_transaction() as sess:
-    #             sess[CURR_USER_KEY] = self.u1_id
-
-    #         u1 = User.query.get(self.u1_id)
-    #         u2 = User.query.get(self.u2_id)
-    #         u3 = User.query.get(self.u3_id)
-    #         u3_username = u3.username
-
-
-    #         resp = c.post(f'/users/stop-following/{self.u3_id}', follow_redirects=True)
-    #         html = resp.get_data(as_text = True)
-
-    #         self.assertEqual(resp.status_code, 200)
-    #         self.assertIn("Test Following Page", html)
-    #         self.assertNotIn(f'{u3_username}', html)
+            self.assertNotIn(f'{u3_username}', html)
 
     def test_edit_user(self):
         """Tests edit in session user"""
@@ -250,6 +250,7 @@ class GeneralUserRoutesTestCase(UserBaseViewTestCase):
 
     def test_toggle_message_other_user_page(self):
         """Tests liking/unliking message from another user's profile page"""
+        # TODO:Separate to 2 funcs
         with self.client as c:
             with c.session_transaction() as sess:
                 sess[CURR_USER_KEY] = self.u1_id
@@ -276,7 +277,7 @@ class GeneralUserRoutesTestCase(UserBaseViewTestCase):
             self.assertEqual(unliked_resp.status_code, 200)
             self.assertIn(f"{u2_username}", unliked_html)
 
-# is the query frozen in time from line 133/134
+
             u1 = User.query.get(self.u1_id)
             msg2 = Message.query.get(self.m2_id)
 

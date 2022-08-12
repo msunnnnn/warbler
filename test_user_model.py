@@ -90,6 +90,7 @@ class UserModelTestCase(TestCase):
     @expectedFailure
     def test_signup_fail(self):
         """Test sign up fails with invalid inputs"""
+# import integrity error?
 
         invalid_user = User.signup('u1','invalidemail', 'password', None)
         db.session.commit()

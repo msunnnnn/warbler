@@ -218,3 +218,30 @@ class GeneralUserRoutesTestCase(UserBaseViewTestCase):
             self.assertEqual(bad_resp.status_code, 200)
             self.assertIn("test edit form", bad_html)
             self.assertIn("wrong password", bad_html)
+
+    def test_delete(self):
+        """Tests delete user"""
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
+
+            resp = c.post('/users/delete', follow_redirects=True)
+            html = resp.get_data(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("test signup", html)
+
+    def test_show_likes(self):
+        """Tests show likes"""
+
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
+
+            resp = c.get(f'/users/{self.u1_id}/likes')
+            html = resp.get_data(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("Test Likes", html)
+

@@ -157,6 +157,9 @@ class GeneralUserRoutesTestCase(UserBaseViewTestCase):
             self.assertIn("Test Following Page", html)
             self.assertIn(f'{u2_username}', html)
 
+            u2 = User.query.get(self.u2_id)
+            u2_username = u2.username
+
             resp = c.post(f'/users/stop-following/{self.u2_id}', follow_redirects=True)
             html = resp.get_data(as_text = True)
 
@@ -245,3 +248,65 @@ class GeneralUserRoutesTestCase(UserBaseViewTestCase):
             self.assertEqual(resp.status_code, 200)
             self.assertIn("Test Likes", html)
 
+    def test_toggle_message_other_user_page(self):
+        """Tests liking/unliking message from another user's profile page"""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
+
+            liked_resp= c.post(f'/users/{self.u2_id}/{self.m2_id}/likes',
+                                follow_redirects= True)
+            liked_html = liked_resp.get_data(as_text = True)
+
+            self.assertEqual(liked_resp.status_code, 200)
+            self.assertIn("fill", liked_html)
+
+            u1 = User.query.get(self.u1_id)
+            msg2 = Message.query.get(self.m2_id)
+            self.assertIn(msg2, u1.likes)
+
+
+            unliked_resp = c.post(f'/users/{self.u2_id}/{self.m2_id}/likes',
+                               follow_redirects= True)
+            unliked_html = unliked_resp.get_data(as_text = True)
+
+            u2 = User.query.get(self.u2_id)
+            u2_username = u2.username
+
+            self.assertEqual(unliked_resp.status_code, 200)
+            self.assertIn(f"{u2_username}", unliked_html)
+
+# is the query frozen in time from line 133/134
+            u1 = User.query.get(self.u1_id)
+            msg2 = Message.query.get(self.m2_id)
+
+            self.assertNotIn(msg2, u1.likes)
+
+    def test_unliking_message_on_own_page(self):
+        """Tests unliking a message on session user's likes page"""
+        with self.client as c:
+            with c.session_transaction() as sess:
+                sess[CURR_USER_KEY] = self.u1_id
+
+            u1 = User.query.get(self.u1_id)
+            msg2 = Message.query.get(self.m2_id)
+            u1.likes.append(msg2)
+            db.session.commit()
+
+
+            resp = c.post(f'/users/{self.u1_id}/{self.m2_id}/likes',
+                               follow_redirects= True)
+            html = resp.get_data(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("Test Likes", html)
+
+    def test_user_not_in_session(self):
+        """Tests displaying signup page when no user in session"""
+
+        with self.client as c:
+            resp = c.get('/')
+            html = resp.get_data(as_text = True)
+
+            self.assertEqual(resp.status_code, 200)
+            self.assertIn("test home anon", html)

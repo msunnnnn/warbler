@@ -288,7 +288,7 @@ def show_likes(user_id):
 
 @app.post('/users/<int:user_id>/<int:msg_id>/likes')
 def handle_like_msg(user_id,msg_id):
-    """Handles unliking a liked message from user page"""
+    """Handles liking/unliking a message from user page"""
 
 
     message = Message.query.get_or_404(msg_id)
@@ -371,7 +371,7 @@ def delete_message(message_id):
 
 @app.post('/messages/<int:message_id>/like')
 def handle_like_message(message_id):
-    """handle likes a message"""
+    """Handle likes a message from home page"""
 
     message = Message.query.get_or_404(message_id)
     if message not in g.user.likes:
